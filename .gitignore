@@ -3,3 +3,12 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+helm
+spark-3.5.0-bin-hadoop3
+
+# Temporary
+src/spark-react-plugin/*
+src/spark-ui-plugin/target/*
+src/spark-ui-plugin/project/target/*
+src/spark-ui-plugin/project/project/target/*

@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title>Hello World - Spark UI Plugin</title>
+    <style>
+        .hello-container {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px;
+        }
+        .hello-title {
+            color: #007bff;
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .hello-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .hello-message {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .hello-time {
+            color: #666;
+            font-style: italic;
+        }
+        .hello-features {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        .hello-features h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        .hello-features ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .hello-features li {
+            margin-bottom: 5px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="hello-container">
+        <div class="hello-content">
+            <h1 class="hello-title">Hello, World!</h1>
+            <p class="hello-message">This is a custom Spark UI tab created by the plugin.</p>
+            <p class="hello-time">Current time: {{currentTime}}</p>
+            <p class="hello-message">This tab was added using Spark 3.x UI API.</p>
+            <p class="hello-message">Plugin is working correctly!</p>
+            <p class="hello-message">Page rendered successfully!</p>
+            
+            <div class="hello-features">
+                <h4>Plugin Features:</h4>
+                <ul>
+                    <li>Custom UI tab integration</li>
+                    <li>External HTML template support</li>
+                    <li>Dynamic content rendering</li>
+                    <li>Spark event logging</li>
+                    <li>SQL query monitoring</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
