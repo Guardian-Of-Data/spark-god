@@ -6,3 +6,5 @@ hs_err_pid*
 
 helm
 spark-3.5.0-bin-hadoop3*
+
+.env
