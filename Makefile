@@ -8,9 +8,11 @@ SPARK_DOWNLOAD_URL := https://archive.apache.org/dist/spark/spark-$(SPARK_VERSIO
 SPARK_TARBALL := spark-$(SPARK_VERSION)-bin-hadoop3.tgz
 
 # Plugin configuration
-PLUGIN_NAME := spark-ui-plugin
+PLUGIN_NAME := spark-god-plugin
 PLUGIN_VERSION := 1.0.0
-PLUGIN_DIR := src/spark-ui-plugin
+PLUGIN_DIR := src/$(PLUGIN_NAME)
+UI_NAME := spark-god-ui
+UI_DIR := src/$(UI_NAME)
 PLUGIN_JAR := $(PLUGIN_DIR)/target/scala-2.12/$(PLUGIN_NAME)_2.12-$(PLUGIN_VERSION).jar
 
 DATAFLINT_VERSION := 0.4.2
@@ -34,7 +36,7 @@ help:
 	@echo "  make spark-status      - Check Spark processes"
 	@echo ""
 	@echo "Plugin commands:"
-	@echo "  make plugin-build      - Build the Spark UI plugin"
+	@echo "  make plugin-build      - Build the SparkGod plugin"
 	@echo "  make plugin-copy       - Copy plugin to Spark jars directory"
 	@echo "  make plugin-test       - Test plugin with sample job"
 	@echo "  make plugin-clean      - Clean plugin build files"
@@ -82,6 +84,17 @@ setup: download-spark install-spark
 	@echo "4. Run: make plugin-build"
 	@echo "5. Run: make plugin-copy"
 	@echo "6. Run: make plugin-test"
+
+ui-init:
+	cd src && npm create vite@latest $(UI_NAME) -- --template react-ts
+	cd $(UI_DIR) && npm install
+	cd $(UI_DIR) && npm install tailwindcss @tailwindcss/vite zustand
+
+ui-test:
+	cd $(UI_DIR) && npm run dev
+
+ui-build:
+	cd $(UI_DIR) && npm run build
 
 # Spark management targets
 .PHONY: start-master
@@ -155,10 +168,15 @@ stop-spark:
 spark-status:
 	@ps aux | grep spark | grep -v -e grep -e spark-status || echo "No Spark processes running"
 
+ui-copy: ui-build
+	rm -rf $(PLUGIN_DIR)/src/main/resources/ui/
+	mkdir -p $(PLUGIN_DIR)/src/main/resources/ui/
+	cp -R $(UI_DIR)/dist/* $(PLUGIN_DIR)/src/main/resources/ui/
+
 # Plugin targets
 .PHONY: plugin-build
-plugin-build:
-	@echo "Building Spark UI plugin..."
+plugin-build: ui-copy
+	@echo "Building SparkGod plugin..."
 	@if [ ! -f "$(PLUGIN_DIR)/build.sbt" ]; then \
 		echo "Error: build.sbt not found in $(PLUGIN_DIR). Plugin project not initialized."; \
 		exit 1; \
@@ -187,7 +205,7 @@ plugin-test:
 	$(SPARK_HOME)/bin/spark-submit \
 		--class com.example.spark.TestApplication \
 		--master spark://localhost:7077 \
-		--conf spark.plugins=org.apache.spark.SparkUIPlugin \
+		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
 		--conf spark.eventLog.enabled=true \
 		--conf spark.eventLog.dir=file:///tmp/spark-events \
 		$(PLUGIN_JAR)
