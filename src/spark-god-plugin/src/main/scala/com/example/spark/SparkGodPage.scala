@@ -87,3 +87,4 @@ class SparkGodPage(parent: SparkGodTab) extends WebUIPage("") {
     }
   }
 }
+ 

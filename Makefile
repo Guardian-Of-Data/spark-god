@@ -14,6 +14,7 @@ PLUGIN_DIR := src/$(PLUGIN_NAME)
 UI_NAME := spark-god-ui
 UI_DIR := src/$(UI_NAME)
 PLUGIN_JAR := $(PLUGIN_DIR)/target/scala-2.12/$(PLUGIN_NAME)_2.12-$(PLUGIN_VERSION).jar
+TEST_APP_JAR := src/test-app/target/scala-2.12/test-app_2.12-1.0.0.jar
 
 DATAFLINT_VERSION := 0.4.2
 
@@ -177,11 +178,11 @@ ui-copy: ui-build
 .PHONY: plugin-build
 plugin-build: ui-copy
 	@echo "Building SparkGod plugin..."
-	@if [ ! -f "$(PLUGIN_DIR)/build.sbt" ]; then \
-		echo "Error: build.sbt not found in $(PLUGIN_DIR). Plugin project not initialized."; \
+	@if [ ! -f "build.sbt" ]; then \
+		echo "Error: build.sbt not found in root directory."; \
 		exit 1; \
 	fi
-	@cd $(PLUGIN_DIR) && sbt clean compile package
+	sbt sparkGodPlugin/clean sparkGodPlugin/compile sparkGodPlugin/package testApp/clean testApp/compile testApp/package
 	@echo "Plugin built: $(PLUGIN_JAR)"
 
 .PHONY: plugin-copy
@@ -208,13 +209,14 @@ plugin-test:
 		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
 		--conf spark.eventLog.enabled=true \
 		--conf spark.eventLog.dir=file:///tmp/spark-events \
-		$(PLUGIN_JAR)
+		$(TEST_APP_JAR)
 
 .PHONY: plugin-clean
 plugin-clean:
 	@echo "Cleaning plugin build files..."
-	@cd $(PLUGIN_DIR) && sbt clean
+	@sbt sparkGodPlugin/clean testApp/clean
 	@rm -rf $(PLUGIN_DIR)/target/
+	@rm -rf src/test-app/target/
 	@echo "Plugin build files cleaned"
 
 # Development targets

@@ -37,8 +37,12 @@ object UITabUtils {
     // Create custom page with proper path
     val sparkGodPage = new SparkGodPage(sparkGodTab)
     
-    // Attach page to tab
+    // Create API page
+    val sparkGodApiPage = new SparkGodApiPage(ui)
+    
+    // Attach pages to tab
     sparkGodTab.attachPage(sparkGodPage)
+    sparkGodTab.attachPage(sparkGodApiPage)
     
     // Attach tab to SparkUI
     ui.attachTab(sparkGodTab)
@@ -67,9 +71,9 @@ class SparkGodDriverPlugin extends DriverPlugin {
     // Get SparkUI directly since we're in the same package
     val ui: SparkUI = sc.ui.get
 
-    // 정적 파일 핸들러 등록 (최신)
-    SparkGodJettyUtils.addStaticHandler(ui, "ui/assets", "/spark-god/assets")
-    SparkGodJettyUtils.addStaticHandler(ui, "ui", "/spark-god") // index.html 등
+    // 정적 파일 핸들러 등록 (assets와 일반 파일 분리)
+    SparkGodJettyUtils.addStaticHandler(ui, "ui/assets", ui.basePath + "/spark-god/assets")
+    SparkGodJettyUtils.addStaticHandler(ui, "ui", ui.basePath + "/spark-god")
 
     // Add SQL listener only if SparkSession already exists
     SparkSession.getActiveSession match {
@@ -94,14 +98,19 @@ class SparkGodDriverPlugin extends DriverPlugin {
           // Check if SparkContext is still active before adding tab
           val scOpt = SparkContext.getActive
           if (scOpt.isDefined && !scOpt.get.isStopped) {
-            UITabUtils.addCustomTab(ui)
-            println("SparkGod Plugin: Custom UI tab added successfully")
+            try {
+              UITabUtils.addCustomTab(ui)
+              println("SparkGod Plugin: Custom UI tab added successfully")
+            } catch {
+              case e: Exception =>
+                println(s"SparkGod Plugin: Could not add UI tab: ${e.getMessage}")
+            }
           } else {
             println("SparkGod Plugin: SparkContext is not available or stopped, skipping UI tab addition")
           }
         } catch {
           case e: Exception =>
-            println(s"SparkGod Plugin: Could not add UI tab in thread: ${e.getMessage}")
+            println(s"SparkGod Plugin: Could not check SparkContext status: ${e.getMessage}")
         }
       }).start()
     } catch {
