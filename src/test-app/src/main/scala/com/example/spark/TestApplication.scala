@@ -36,9 +36,22 @@ object TestApplication {
     
     // Keep the application running for a while to test the UI
     println("Application will run for 30 seconds to allow UI testing...")
-    Thread.sleep(30000)
+    println("Press Ctrl+C to stop the application early")
     
-    spark.stop()
-    println("Test application completed")
+    try {
+      Thread.sleep(30000)
+    } catch {
+      case _: InterruptedException =>
+        println("Application interrupted by user")
+    }
+    
+    println("Stopping Spark application...")
+    try {
+      spark.stop()
+      println("Test application completed successfully")
+    } catch {
+      case e: Exception =>
+        println(s"Error stopping Spark application: ${e.getMessage}")
+    }
   }
 }
