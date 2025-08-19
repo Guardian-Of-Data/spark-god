@@ -275,3 +275,18 @@ quick-start: setup
 	@echo "Then open:"
 	@echo "- Spark Master UI: http://localhost:8080"
 	@echo "- Spark History Server: http://localhost:18080"
+
+
+.PHONY: agent-setup
+agent-setup:
+	@echo "Setting up SparkGod Agent..."
+	@echo "Installing Python MCP server dependencies..."
+	cd $(MCP_SERVER_DIR) && pip3 install -r requirements.txt
+	@echo "Installing Python Agent dependencies..."
+	cd $(AGENT_DIR) && pip3 install -r requirements.txt
+	@echo "SparkGod Agent setup complete!"
+
+.PHONY: agent-server
+agent-server:
+	@echo "Starting SparkGod Agent web server..."
+	cd $(AGENT_DIR) && python3 web_spark_god_agent.py
