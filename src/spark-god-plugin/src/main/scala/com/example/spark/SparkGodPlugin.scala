@@ -39,10 +39,14 @@ object UITabUtils {
     
     // Create API page
     val sparkGodApiPage = new SparkGodApiPage(ui)
+
+    // Create Config API page
+    val sparkGodConfigPage = new SparkGodConfigPage(ui)
     
     // Attach pages to tab
     sparkGodTab.attachPage(sparkGodPage)
     sparkGodTab.attachPage(sparkGodApiPage)
+    sparkGodTab.attachPage(sparkGodConfigPage)
     
     // Attach tab to SparkUI
     ui.attachTab(sparkGodTab)

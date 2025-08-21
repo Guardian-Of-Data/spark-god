@@ -1,83 +1,37 @@
-import { useState } from 'react'
-import './App.css'
-import reactLogo from './assets/react.svg'
-import SparkGodApi from './components/SparkGodApi'
-import viteLogo from '/vite.svg'
+import "./App.css"
+import SparkGodApi from "./components/SparkGodApi"
+import SparkGodChatbot from "./components/SparkGodChatbot"
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [showApi, setShowApi] = useState(false)
-
-  if (showApi) {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <h1>SparkGod Dashboard</h1>
-          <p>Real-time Spark application monitoring</p>
-          <button 
-            onClick={() => setShowApi(false)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              padding: '0.5rem 1rem',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              marginTop: '1rem'
-            }}
-          >
-            ← Back to Main
-          </button>
-        </header>
-        <main>
-          <SparkGodApi />
-        </main>
-      </div>
-    )
-  }
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>SparkGod</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-        <button 
-          onClick={() => setShowApi(true)}
-          style={{
-            background: '#667eea',
-            color: 'white',
-            border: 'none',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            fontWeight: '500',
-            marginTop: '1rem',
-            transition: 'background 0.2s ease'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.background = '#5a6fd8'}
-          onMouseOut={(e) => e.currentTarget.style.background = '#667eea'}
-        >
-          View SparkGod API Data
-        </button>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-indigo-50 to-white">
+      {/* Header */}
+      <header className="w-full bg-white shadow-sm sticky top-0 z-50">
+        {/* 메인과 동일한 폭 컨테이너 */}
+        <div className="max-w-6xl mx-auto px-6 md:px-12 py-6">
+          <div className="pl-8 ml-4 md:ml-6 lg:ml-8 py-6">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
+            SparkGod Dashboard
+          </h1>
+          </div>
+        </div>
+      </header>
+
+      {/* Main */}
+      <main className="max-w-6xl mx-auto px-6 md:px-12 py-10 w-full">
+        <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
+          <SparkGodApi />
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t text-center py-6 text-sm text-gray-500">
+        © {new Date().getFullYear()} SparkGod. Built with ❤️ for data engineers.
+      </footer>
+
+      {/* Chatbot (floating) */}
+      <SparkGodChatbot />
+    </div>
   )
 }
 

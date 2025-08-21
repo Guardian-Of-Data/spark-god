@@ -1,156 +1,53 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root{
+  --bg:#f8fafc; --card:#fff; --border:#e5e7eb; --text:#111827; --muted:#6b7280; --brand:#4f46e5;
+}
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+/* 페이지 컨테이너 */
+.page{padding:1.25rem clamp(1rem,4vw,2.5rem)}
+.container{max-width:1440px;margin:0 auto}
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* 3열 그리드: 좌(3)/중(6)/우(3) */
+.grid-3{display:grid;grid-template-columns:1fr;gap:1.25rem}
+@media (min-width:1280px){.grid-3{grid-template-columns:3fr 6fr 3fr}}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
+/* 카드 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  box-shadow:0 6px 24px rgba(17,24,39,.05);padding:1.1rem}
+.card h3{margin:0 0 .75rem;font-size:1.05rem;color:var(--brand);font-weight:800}
 
-.card {
-  padding: 2em;
-}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+@media (min-width:1024px){.kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi{border:1px solid var(--border);border-radius:12px;padding:.8rem .95rem;background:#fff}
+.kpi .label{font-size:.8rem;color:var(--muted)}
+.kpi .value{font-size:1.4rem;font-weight:800}
 
-.read-the-docs {
-  color: #888;
-}
+/* 미니 KPI */
+.mini{border:1px solid var(--border);border-radius:12px;padding:.7rem .8rem;text-align:center}
+.mini .l{font-size:.75rem;color:var(--muted)}
+.mini .v{font-size:1.25rem;font-weight:800}
 
-/* SparkGod Dashboard 스타일 */
-.App {
-  text-align: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
+/* 정보 그리드 */
+.info-grid{display:grid;grid-template-columns:max-content 1fr;gap:.35rem 1rem}
+.info-grid .k{font-weight:600}
+.info-grid .v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.App-header {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  backdrop-filter: blur(10px);
-}
+/* 프로그레스바 */
+.progress{height:12px;background:#f1f5f9;border-radius:999px;overflow:hidden}
+.progress>span{display:block;height:100%;background:#3b82f6}
 
-.App-header h1 {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
+/* 차트 높이 고정 */
+.chart-h{height:320px}
 
-.App-header p {
-  margin: 0.5rem 0 0 0;
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-/* SparkGodApi 컴포넌트 스타일 */
-main > div {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  color: #333;
-}
-
-main h2 {
-  color: #667eea;
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
-}
-
-main h3 {
-  color: #764ba2;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-}
-
-main p {
-  margin: 0.5rem 0;
-  line-height: 1.6;
-}
-
-main strong {
-  color: #555;
-  font-weight: 600;
-}
-
-/* 그리드 레이아웃 */
-main div[style*="grid"] {
-  margin: 1rem 0;
-}
-
-/* 카드 스타일 */
-main div[style*="border"] {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(103, 126, 234, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-main div[style*="border"]:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* 로딩 및 에러 상태 */
-main div[style*="textAlign: center"] {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  padding: 2rem;
-  margin: 1rem 0;
-}
-
-main div[style*="color: red"] {
-  background: rgba(255, 235, 235, 0.9);
-  border: 1px solid #ff6b6b;
-  border-radius: 10px;
-  padding: 1.5rem;
-  margin: 1rem 0;
-}
-
-main button {
-  background: #667eea;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s ease;
-}
-
-main button:hover {
-  background: #5a6fd8;
-}
+/* 도넛 중앙 라벨 */
+.center-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.center-overlay .chip{background:rgba(255,255,255,.92);border-radius:10px;padding:.35rem .55rem;
+  box-shadow:0 4px 16px rgba(0,0,0,.06);text-align:center}
+.small{font-size:.75rem;color:var(--muted)}
+.legend{display:flex;justify-content:center;gap:1rem;margin-top:.5rem;font-size:.85rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.4rem}

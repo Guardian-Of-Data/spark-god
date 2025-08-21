@@ -16,6 +16,10 @@ UI_DIR := src/$(UI_NAME)
 PLUGIN_JAR := $(PLUGIN_DIR)/target/scala-2.12/$(PLUGIN_NAME)_2.12-$(PLUGIN_VERSION).jar
 TEST_APP_JAR := src/test-app/target/scala-2.12/test-app_2.12-1.0.0.jar
 
+# Agent configuration
+AGENT_DIR := src/spark-god-agent
+MCP_SERVER_DIR := src/spark-god-mcp-server
+
 DATAFLINT_VERSION := 0.4.2
 
 # Default target
@@ -39,8 +43,19 @@ help:
 	@echo "Plugin commands:"
 	@echo "  make plugin-build      - Build the SparkGod plugin"
 	@echo "  make plugin-copy       - Copy plugin to Spark jars directory"
-	@echo "  make plugin-test       - Test plugin with sample job"
+	@echo "  make plugin-test       - Test plugin with normal scenario"
+	@echo "  make plugin-test-memory - Test with memory stress (for OOM errors)"
+	@echo "  make plugin-test-shuffle - Test with shuffle-heavy operations"
+	@echo "  make plugin-test-error  - Test with intentional errors"
+	@echo "  make plugin-test-timeout - Test with timeout scenarios"
+	@echo "  make plugin-test-gc     - Test with GC stress"
+	@echo "  make plugin-test-safe   - Test with safe scenario (never crashes)"
 	@echo "  make plugin-clean      - Clean plugin build files"
+	@echo ""
+	@echo "Agent commands:"
+	@echo "  make agent-setup       - Setup SparkGod Agent and MCP Server"
+	@echo "  make agent-server      - Start SparkGod Agent web server"
+	@echo "  make agent-cli         - Run SparkGod Agent in CLI mode"
 	@echo ""
 	@echo "Development commands:"
 	@echo "  make sample-job        - Run a sample Spark job"
@@ -106,7 +121,7 @@ start-master:
 		exit 1; \
 	fi
 	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
-	$(SPARK_HOME)/sbin/start-master.sh
+	$(SPARK_HOME)/sbin/start-master.sh --host localhost
 	@echo "Spark master started at http://localhost:8080"
 
 .PHONY: start-worker
@@ -117,7 +132,7 @@ start-worker:
 		exit 1; \
 	fi
 	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
-	$(SPARK_HOME)/sbin/start-slave.sh spark://localhost:7077
+	$(SPARK_HOME)/sbin/start-slave.sh --host localhost spark://localhost:7077
 	@echo "Spark worker started"
 
 .PHONY: start-history
@@ -139,12 +154,13 @@ stop-history:
 		$(SPARK_HOME)/sbin/stop-history-server.sh; \
 	fi
 	@echo "Spark History Server stopped"
+	@echo "Spark History Server stopped"
 
 stop-master:
 	@echo "Stopping Spark Master..."
 	@if [ -d "$(SPARK_HOME)" ]; then \
 		export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
-		$(SPARK_HOME)/sbin/stop-master.sh; \
+		$(SPARK_HOME)/sbin/stop-master.sh --host localhost; \
 	fi
 	@echo "Spark Master stopped"
 
@@ -152,7 +168,7 @@ stop-worker:
 	@echo "Stopping Spark Worker..."
 	@if [ -d "$(SPARK_HOME)" ]; then \
 		export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
-		$(SPARK_HOME)/sbin/stop-slave.sh; \
+		$(SPARK_HOME)/sbin/stop-slave.sh --host localhost; \
 	fi
 	@echo "Spark Worker stopped"
 
@@ -197,7 +213,7 @@ plugin-copy:
 
 .PHONY: plugin-test
 plugin-test:
-	@echo "Testing plugin with sample job..."
+	@echo "Testing plugin with normal scenario..."
 	@if [ ! -d "$(SPARK_HOME)" ]; then \
 		echo "Error: Spark not installed. Run 'make setup' first."; \
 		exit 1; \
@@ -209,7 +225,74 @@ plugin-test:
 		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
 		--conf spark.eventLog.enabled=true \
 		--conf spark.eventLog.dir=file:///tmp/spark-events \
-		$(TEST_APP_JAR)
+		$(TEST_APP_JAR) normal
+
+.PHONY: plugin-test-memory
+plugin-test-memory:
+	@echo "Testing plugin with memory stress scenario..."
+	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
+	$(SPARK_HOME)/bin/spark-submit \
+		--class com.example.spark.TestApplication \
+		--master spark://localhost:7077 \
+		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
+		--conf spark.eventLog.enabled=true \
+		--conf spark.eventLog.dir=file:///tmp/spark-events \
+		--conf spark.executor.memory=256m \
+		--conf spark.driver.memory=256m \
+		$(TEST_APP_JAR) memory
+
+.PHONY: plugin-test-shuffle
+plugin-test-shuffle:
+	@echo "Testing plugin with shuffle-heavy scenario..."
+	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
+	$(SPARK_HOME)/bin/spark-submit \
+		--class com.example.spark.TestApplication \
+		--master spark://localhost:7077 \
+		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
+		--conf spark.eventLog.enabled=true \
+		--conf spark.eventLog.dir=file:///tmp/spark-events \
+		--conf spark.sql.shuffle.partitions=50 \
+		$(TEST_APP_JAR) shuffle
+
+.PHONY: plugin-test-error
+plugin-test-error:
+	@echo "Testing plugin with intentional errors..."
+	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
+	$(SPARK_HOME)/bin/spark-submit \
+		--class com.example.spark.TestApplication \
+		--master spark://localhost:7077 \
+		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
+		--conf spark.eventLog.enabled=true \
+		--conf spark.eventLog.dir=file:///tmp/spark-events \
+		$(TEST_APP_JAR) error
+
+.PHONY: plugin-test-timeout
+plugin-test-timeout:
+	@echo "Testing plugin with timeout scenario..."
+	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
+	$(SPARK_HOME)/bin/spark-submit \
+		--class com.example.spark.TestApplication \
+		--master spark://localhost:7077 \
+		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
+		--conf spark.eventLog.enabled=true \
+		--conf spark.eventLog.dir=file:///tmp/spark-events \
+		--conf spark.network.timeout=10s \
+		--conf spark.sql.broadcastTimeout=5s \
+		$(TEST_APP_JAR) timeout
+
+.PHONY: plugin-test-gc
+plugin-test-gc:
+	@echo "Testing plugin with GC stress scenario..."
+	@export SPARK_HOME=$(PWD)/$(SPARK_HOME) && \
+	$(SPARK_HOME)/bin/spark-submit \
+		--class com.example.spark.TestApplication \
+		--master spark://localhost:7077 \
+		--conf spark.plugins=org.apache.spark.SparkGodPlugin \
+		--conf spark.eventLog.enabled=true \
+		--conf spark.eventLog.dir=file:///tmp/spark-events \
+		--conf spark.executor.memory=256m \
+		--conf spark.driver.memory=256m \
+		$(TEST_APP_JAR) gc
 
 .PHONY: plugin-clean
 plugin-clean:
@@ -275,3 +358,18 @@ quick-start: setup
 	@echo "Then open:"
 	@echo "- Spark Master UI: http://localhost:8080"
 	@echo "- Spark History Server: http://localhost:18080"
+
+# Agent targets
+.PHONY: agent-setup
+agent-setup:
+	@echo "Setting up SparkGod Agent..."
+	@echo "Installing Python MCP server dependencies..."
+	cd $(MCP_SERVER_DIR) && pip3 install -r requirements.txt
+	@echo "Installing Python Agent dependencies..."
+	cd $(AGENT_DIR) && pip3 install -r requirements.txt
+	@echo "SparkGod Agent setup complete!"
+
+.PHONY: agent-server
+agent-server:
+	@echo "Starting SparkGod Agent web server..."
+	cd $(AGENT_DIR) && python3 web_spark_god_agent.py

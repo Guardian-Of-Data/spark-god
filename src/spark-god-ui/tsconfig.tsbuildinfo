@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/sparkgodapi.tsx","./src/components/sparkgodchatbot.tsx","./src/services/bedrockservice.ts","./src/services/sparkconfigservice.ts","./src/services/strandagentsservice.ts"],"errors":true,"version":"5.8.3"}
