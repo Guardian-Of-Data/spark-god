@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import reactLogo from './assets/react.svg'
 import SparkGodApi from './components/SparkGodApi'
+import SparkGodChatbot from './components/SparkGodChatbot'
 import viteLogo from '/vite.svg'
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
         <header className="App-header">
           <h1>SparkGod Dashboard</h1>
           <p>Real-time Spark application monitoring</p>
-          <button 
+          <button
             onClick={() => setShowApi(false)}
             style={{
               background: 'rgba(255, 255, 255, 0.2)',
@@ -32,6 +33,7 @@ function App() {
         <main>
           <SparkGodApi />
         </main>
+        <footer><SparkGodChatbot /></footer>
       </div>
     )
   }
@@ -54,7 +56,7 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
-        <button 
+        <button
           onClick={() => setShowApi(true)}
           style={{
             background: '#667eea',
@@ -77,6 +79,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <SparkGodChatbot />
     </>
   )
 }
